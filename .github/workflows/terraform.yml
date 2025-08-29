@@ -1,33 +1,35 @@
 name: Terraform
 
 on:
-  pull_request:
-    branches:
-      - main
   push:
-    branches:
-      - main
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: {}
 
 jobs:
   terraform:
-    name: Terraform Checks
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v3
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
 
       - name: Terraform Format
         run: terraform fmt -check
 
       - name: Terraform Init
         run: terraform init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWSACCESSKEYID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWSSECRETACCESSKEY }}
+          AWS_REGION: ${{ secrets.AWSREGION }}
 
       - name: Terraform Validate
         run: terraform validate
 
       - name: Terraform Plan
-        run: terraform plan
+        run: terraform plan -input=false -no-color
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWSACCESSKEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWSSECRETACCESSKEY }}
+          AWS_REGION: ${{ secrets.AWSREGION }}

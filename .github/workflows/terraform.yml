@@ -1,3 +1,12 @@
+name: Terraform CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
 jobs:
   terraform:
     runs-on: ubuntu-latest
@@ -8,7 +17,7 @@ jobs:
       - name: Terraform Format
         run: terraform fmt -check
 
-      # downloads providers/modules without touching the S3 backend
+      # download providers without touching the backend (OK until S3 backend is ready)
       - name: Terraform Init (no backend)
         run: terraform init -backend=false -upgrade -input=false -no-color
 

@@ -8,7 +8,7 @@ jobs:
       - name: Terraform Format
         run: terraform fmt -check
 
-      # 👇 downloads providers/modules without touching your S3 backend
+      # downloads providers/modules without touching the S3 backend
       - name: Terraform Init (no backend)
         run: terraform init -backend=false -upgrade -input=false -no-color
 

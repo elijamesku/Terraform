@@ -1,35 +1,33 @@
 name: Terraform
-
 on:
-  push:
-    branches: [ main ]
   pull_request:
+    branches: [ main ]
+  push:
     branches: [ main ]
   workflow_dispatch: {}
 
 jobs:
-  terraform:
+  tf:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      # add later: id-token: write  # for OIDC
+
     steps:
       - uses: actions/checkout@v4
       - uses: hashicorp/setup-terraform@v3
+      - run: terraform fmt -check
+      - run: terraform validate
 
-      - name: Terraform Format
-        run: terraform fmt -check
+      # Enable later once OIDC + backend exist
+      - name: Terraform Init (S3 backend)
+        if: false   # change to true after backend/creds
+        run: terraform init -input=false -no-color
 
-      - name: Terraform Init
-        run: terraform init
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWSACCESSKEYID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWSSECRETACCESSKEY }}
-          AWS_REGION: ${{ secrets.AWSREGION }}
-
-      - name: Terraform Validate
-        run: terraform validate
-
-      - name: Terraform Plan
+      - name: Terraform Plan (PRs)
+        if: false   # enable later (or guard on event == pull_request)
         run: terraform plan -input=false -no-color
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWSACCESSKEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWSSECRETACCESSKEY }}
-          AWS_REGION: ${{ secrets.AWSREGION }}
+
+      - name: Terraform Apply (main only, gated)
+        if: false   # enable later; you can also use environments/approvals
+        run: terraform apply -auto-approve -input=false -no-color

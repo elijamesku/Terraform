@@ -2,6 +2,7 @@ provider "aws" {
   region = "us-east-2"
 }
 
+#port 80 access ingress + egress
 resource "aws_security_group" "web" {
   name        = "Terraform-EC2-1-instance"
   description = "Allow HTTP from anywhere"

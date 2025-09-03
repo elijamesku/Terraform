@@ -68,7 +68,6 @@ resource "aws_launch_template" "web" {
       Name = "terraform-asg-example"
     }
   }
-
   update_default_version = true
 }
 

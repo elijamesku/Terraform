@@ -1,11 +1,14 @@
+#defining provider and aws region(data center)
 provider "aws" {
   region = "us-east-2"
 }
 
+#defining default vpc to use
 data "aws_vpc" "default" {
   default = true
 }
 
+#defining subnets to use from default vpc above
 data "aws_subnets" "default" {
   filter {
     name   = "vpc-id"
@@ -13,7 +16,7 @@ data "aws_subnets" "default" {
   }
 }
 
-#port 80 access ingress + egress
+#port 80 access ingress + egress(inbound + outbound traffic)
 resource "aws_security_group" "web" {
   name        = "terraform-web-sg"
   description = "Allow HTTP from anywhere"
@@ -34,6 +37,7 @@ resource "aws_security_group" "web" {
   }
 }
 
+#creating launch template for ec2s
 resource "aws_launch_template" "web" {
   name_prefix            = "web-"
   image_id               = "ami-0fb653ca2d3203ac1"
@@ -49,7 +53,8 @@ resource "aws_launch_template" "web" {
               nohup python3 -m http.server 80 > /var/log/web.log 2>&1 &
               EOF
   )
-  #tag instances/volumes at launch
+
+  #tag instances/volumes at launch to track(tag) which ec2 the instances(computers) and volumes(hard disks) are attached to
   tag_specifications {
     resource_type = "instance"
     tags = {
@@ -67,6 +72,7 @@ resource "aws_launch_template" "web" {
   update_default_version = true
 }
 
+#creating aws autoscaling group with suze configs 
 resource "aws_autoscaling_group" "web" {
   name                = "terraform-asg-example"
   desired_capacity    = 2
@@ -74,6 +80,7 @@ resource "aws_autoscaling_group" "web" {
   max_size            = 10
   vpc_zone_identifier = data.aws_subnets.default.ids
 
+  #launch template with latest version
   launch_template {
     id      = aws_launch_template.web.id
     version = "$Latest"
@@ -86,7 +93,7 @@ resource "aws_autoscaling_group" "web" {
     propagate_at_launch = true
   }
 
-  #roll instances automatically when the LT changes 
+  #roll instances automatically when the LT changes meaning always have at least 90% running
   instance_refresh {
     strategy = "Rolling"
     preferences {
@@ -95,11 +102,13 @@ resource "aws_autoscaling_group" "web" {
     triggers = ["launch_template"]
   }
 
+  #create a instance and ensure that it works before destroying the one that was duplicated
   lifecycle {
     create_before_destroy = true
   }
 }
 
+#load balancer so that you dont have to deploy a ip for each ec2 you want people to ingress to 
 resource "aws_lb" "loadbalancer" {
   name               = "terraform-asg-example"
   load_balancer_type = "application"
@@ -107,6 +116,7 @@ resource "aws_lb" "loadbalancer" {
 
 }
 
+#lb listener
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.loadbalancer.arn
   port              = 80

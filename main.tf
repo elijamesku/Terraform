@@ -3,6 +3,14 @@ provider "aws" {
   region = "us-east-2"
 }
 
+resource "aws_s3_bucket" "terraform-state" {
+    bucket = "terraform-up-and-running-state"
+
+    lifecycle {
+        prevent_destroy = true
+    }
+}
+
 #defining default vpc to use
 data "aws_vpc" "default" {
   default = true

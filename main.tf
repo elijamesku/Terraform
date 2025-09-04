@@ -10,6 +10,19 @@ resource "aws_s3_bucket" "terraform-state" {
   lifecycle {
     prevent_destroy = true
   }
+
+  tags = {
+    Name = "terraform-state"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "public_access" {
+  bucket                  = aws_s3_bucket.terraform-state.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+
 }
 
 #adding versioning to S3
@@ -22,7 +35,7 @@ resource "aws_s3_bucket_versioning" "enabled" {
 
 }
 
-#adding encryption to s3
+#default encryption at rest (SSE-S3)
 resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
   bucket = aws_s3_bucket.terraform-state.id
 
@@ -31,15 +44,6 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
       sse_algorithm = "AES256"
     }
   }
-}
-
-resource "aws_s3_bucket_public_access_block" "public_access" {
-  bucket                  = aws_s3_bucket.terraform-state.id
-  block_public_acls       = true
-  block_public_policy     = true
-  ignore_public_acls      = true
-  restrict_public_buckets = true
-
 }
 
 #defining default vpc to use

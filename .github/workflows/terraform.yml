@@ -10,49 +10,26 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
-
-    # Run terraform commands from aws/dev
     defaults:
       run:
         working-directory: aws/dev
 
     steps:
       - uses: actions/checkout@v4
-
       - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.6.6
 
-      # Configure AWS creds (skipped for now, handled locally via export)
-      # - name: Configure AWS credentials
-      #   run: |
-      #     export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
-      #     export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      #     export AWS_REGION=${{ secrets.AWS_REGION }}
-
       - name: Terraform Format
         run: terraform fmt -check -no-color
 
-      - name: Terraform Init (S3 backend)
-        run: |
-          terraform init \
-            -backend-config="bucket=${{ secrets.TF_S3_BUCKET }}" \
-            -backend-config="key=aws/dev/terraform.tfstate" \
-            -backend-config="region=${{ secrets.AWS_REGION }}" \
-            -backend-config="encrypt=true" \
-            -input=false -no-color
-
-      - name: Select/Create Workspace (dev)
-        run: terraform workspace select dev || terraform workspace new dev
+      # No backend, no provider auth needed
+      - name: Terraform Init (no backend)
+        run: terraform init -backend=false -input=false -no-color
 
       - name: Terraform Validate
         run: terraform validate -no-color
 
-      - name: Terraform Plan
-        run: terraform plan -out=tfplan.bin -no-color
-
-      - name: Upload plan artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: tfplan-dev-aws
-          path: aws/dev/tfplan.bin
+      # Intentionally skip plan because data sources need AWS creds
+      # - name: Terraform Plan
+      #   run: terraform plan -no-color

@@ -1,3 +1,4 @@
+/*
 terraform {
   backend "s3" {
     bucket       = "ss33-bucket"
@@ -7,3 +8,4 @@ terraform {
     use_lockfile = true
   }
 }
+*/

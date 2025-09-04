@@ -4,11 +4,11 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "terraform-state" {
-    bucket = "terraform-up-and-running-state"
+  bucket = "terraform-up-and-running-state"
 
-    lifecycle {
-        prevent_destroy = true
-    }
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 #defining default vpc to use

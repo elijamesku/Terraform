@@ -156,7 +156,7 @@ variable "server_port" {
 
 resource "aws_security_group" "alb" {
   name   = "terraform-example-alb"
-  vpc_id = data.aws_vpc.default
+  vpc_id = data.aws_vpc.default.id
 
   ingress {
     from_port   = 80

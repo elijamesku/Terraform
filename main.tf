@@ -3,12 +3,23 @@ provider "aws" {
   region = "us-east-2"
 }
 
+#S3 bucket creation
 resource "aws_s3_bucket" "terraform-state" {
   bucket = "SS33-bucket"
 
   lifecycle {
     prevent_destroy = true
   }
+}
+
+#adding versioning to S3
+resource "aws_s3_bucket_versioning" "enabled" {
+  bucket = aws_s3_bucket.terraform-state.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+
 }
 
 #defining default vpc to use
@@ -62,7 +73,7 @@ resource "aws_launch_template" "web" {
               EOF
   )
 
-  #tag instances/volumes at launch to track(tag) which ec2 the instances(computers) and volumes(hard disks) are attached to
+  #tagging instances/volumes at launch to track(tag) which ec2 the instances(computers) and volumes(hard disks) are attached to
   tag_specifications {
     resource_type = "instance"
     tags = {

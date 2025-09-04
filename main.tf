@@ -133,8 +133,16 @@ resource "aws_lb_listener" "http" {
   }
 }
 
+variable "server_port" {
+  description = "Port the app listens on"
+  type        = number
+  default     = 80
+
+}
+
 resource "aws_security_group" "alb" {
-  name = "terraform-example-alb"
+  name   = "terraform-example-alb"
+  vpc_id = data.aws_subnets.default.id
 
   ingress {
     from_port   = 80
@@ -150,5 +158,21 @@ resource "aws_security_group" "alb" {
     cidr_blocks = ["0.0.0.0/0"]
 
   }
+}
 
+resource "aws_lb_target_group" "asg" {
+  name     = "terraform-asg-example"
+  port     = var.server_port
+  protocol = "HTTP"
+  vpc_id   = data.aws_vpc.default.id
+
+  health_check {
+    path                = "/"
+    protocol            = "HTTP"
+    matcher             = "200"
+    interval            = 15
+    timeout             = 3
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
 }

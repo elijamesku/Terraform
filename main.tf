@@ -4,7 +4,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "terraform-state" {
-  bucket = "terraform-up-and-running-state"
+  bucket = "SS33-bucket"
 
   lifecycle {
     prevent_destroy = true

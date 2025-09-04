@@ -5,7 +5,7 @@ provider "aws" {
 
 #S3 bucket creation
 resource "aws_s3_bucket" "terraform-state" {
-  bucket = "SS33-bucket"
+  bucket = "ss33-bucket"
 
   lifecycle {
     prevent_destroy = true
@@ -44,6 +44,12 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "default" {
       sse_algorithm = "AES256"
     }
   }
+}
+
+output "s3_bucket_arn" {
+  value       = aws_s3_bucket.terraform-state.arn
+  description = "The ARN of the S3 bucket"
+
 }
 
 #defining default vpc to use

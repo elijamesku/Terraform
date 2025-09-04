@@ -73,10 +73,12 @@ resource "aws_launch_template" "web" {
 
 #creating aws autoscaling group with suze configs 
 resource "aws_autoscaling_group" "web" {
+  health_check_type   = "ELB"
   name                = "terraform-asg-example"
   desired_capacity    = 2
   min_size            = 2
   max_size            = 10
+  target_group_arns   = [aws_lb_target_group.asg.arn]
   vpc_zone_identifier = data.aws_subnets.default.ids
 
   #launch template with latest version
@@ -123,13 +125,8 @@ resource "aws_lb_listener" "http" {
   protocol          = "HTTP"
 
   default_action {
-    type = "fixed-response"
-
-    fixed_response {
-      content_type = "text/plain"
-      message_body = "404: page not found"
-      status_code  = 404
-    }
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.asg.arn
   }
 }
 

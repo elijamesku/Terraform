@@ -5,7 +5,7 @@ resource "random_pet" "suffix" {
 
 # Application Load Balancer
 resource "aws_lb" "loadbalancer" {
-  name               = "dev-alb-${random_pet.suffix.id}"   # <= unique
+  name               = "dev-alb-${random_pet.suffix.id}" # <= unique
   load_balancer_type = "application"
   subnets            = data.aws_subnets.default.ids
   security_groups    = [aws_security_group.alb.id]
@@ -20,7 +20,7 @@ resource "aws_lb" "loadbalancer" {
 
 # Target group for the ASG/instances
 resource "aws_lb_target_group" "asg" {
-  name     = "dev-asg-${random_pet.suffix.id}"              # <= unique
+  name     = "dev-asg-${random_pet.suffix.id}" # <= unique
   port     = var.server_port
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default.id

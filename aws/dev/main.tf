@@ -7,13 +7,13 @@ terraform {
     }
   }
 }
-
+/*
 provider "aws" {
   region = "us-east-2"
 }
 
 module "app" {
-  source = "./app"
+  source = ".dev/app"
   # pass any variables the app module expects:
   # vpc_id = var.vpc_id
 }
@@ -22,3 +22,4 @@ module "mysql" {
   source = "./data-stores/mysql"
   # db_name = var.db_name
 }
+*/

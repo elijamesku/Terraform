@@ -1,14 +1,26 @@
-#load balancer so that you dont have to deploy a ip for each ec2 you want people to ingress to 
+# one shared random suffix for this stack
+resource "random_pet" "suffix" {
+  length = 2
+}
+
+# Application Load Balancer
 resource "aws_lb" "loadbalancer" {
-  name               = "terraform-asg-example"
+  name               = "dev-alb-${random_pet.suffix.id}"   # <= unique
   load_balancer_type = "application"
   subnets            = data.aws_subnets.default.ids
   security_groups    = [aws_security_group.alb.id]
 
+  # optional but nice:
+  # idle_timeout = 60
+  # enable_deletion_protection = false
+  tags = {
+    Name = "dev-alb-${random_pet.suffix.id}"
+  }
 }
 
+# Target group for the ASG/instances
 resource "aws_lb_target_group" "asg" {
-  name     = "terraform-asg-example"
+  name     = "dev-asg-${random_pet.suffix.id}"              # <= unique
   port     = var.server_port
   protocol = "HTTP"
   vpc_id   = data.aws_vpc.default.id
@@ -22,9 +34,13 @@ resource "aws_lb_target_group" "asg" {
     healthy_threshold   = 2
     unhealthy_threshold = 2
   }
+
+  tags = {
+    Name = "dev-asg-${random_pet.suffix.id}"
+  }
 }
 
-#lb listener
+# HTTP listener (80)
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.loadbalancer.arn
   port              = 80
@@ -36,14 +52,17 @@ resource "aws_lb_listener" "http" {
   }
 }
 
+# Listener rule (match all paths)
 resource "aws_lb_listener_rule" "asg" {
   listener_arn = aws_lb_listener.http.arn
   priority     = 100
+
   condition {
     path_pattern {
-      values = ["*"]
+      values = ["/*"]    # match everything
     }
   }
+
   action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.asg.arn

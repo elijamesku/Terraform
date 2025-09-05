@@ -51,7 +51,7 @@ resource "aws_lb_listener" "http" {
     target_group_arn = aws_lb_target_group.asg.arn
   }
 }
-
+/*
 # Listener rule (match all paths)
 resource "aws_lb_listener_rule" "asg" {
   listener_arn = aws_lb_listener.http.arn
@@ -68,3 +68,4 @@ resource "aws_lb_listener_rule" "asg" {
     target_group_arn = aws_lb_target_group.asg.arn
   }
 }
+*/

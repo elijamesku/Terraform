@@ -1,17 +1,14 @@
-# port 80 access for your instances (only from the ALB)
 resource "aws_security_group" "web" {
   # name        = "terraform-web-sg"
-  name_prefix = "dev-web-" # <= unique name
+  name_prefix = "dev-web-" 
   description = "Allow HTTP from ALB only"
   vpc_id      = data.aws_vpc.default.id
 
-  # Best practice: only ALB -> web, not the whole internet
   ingress {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    security_groups = [aws_security_group.alb.id] # <= ALB SG source
-    # (older provider versions use 'source_security_group_id' instead)
+    security_groups = [aws_security_group.alb.id] 
   }
 
   egress {
@@ -24,10 +21,10 @@ resource "aws_security_group" "web" {
   tags = { Name = "dev-web" }
 }
 
-# ALB security group (internet -> ALB:80)
+# ALB security group (internet ALB:80)
 resource "aws_security_group" "alb" {
   # name   = "terraform-example-alb"
-  name_prefix = "dev-alb-" # <= unique name
+  name_prefix = "dev-alb-"
   vpc_id      = data.aws_vpc.default.id
 
   ingress {

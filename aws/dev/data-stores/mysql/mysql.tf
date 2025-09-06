@@ -32,7 +32,6 @@ resource "aws_security_group" "mysql_dev" {
 resource "aws_db_instance" "mysql" {
   identifier_prefix = "dev-mysql"
   engine            = "mysql"
-  engine_version    = "8.0.36"
   instance_class    = "db.t3.micro"
   allocated_storage = 20
   storage_type      = "gp3"

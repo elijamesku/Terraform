@@ -1,6 +1,6 @@
 resource "aws_security_group" "web" {
   # name        = "terraform-web-sg"
-  name_prefix = "dev-web-" 
+  name_prefix = "dev-web-"
   description = "Allow HTTP from ALB only"
   vpc_id      = data.aws_vpc.default.id
 
@@ -8,7 +8,7 @@ resource "aws_security_group" "web" {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
-    security_groups = [aws_security_group.alb.id] 
+    security_groups = [aws_security_group.alb.id]
   }
 
   egress {

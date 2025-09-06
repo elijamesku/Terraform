@@ -15,6 +15,10 @@ resource "aws_launch_template" "web" {
               EOF
   )
 
+  iam_instance_profile {
+    name = aws_iam_instance_profile.app.name
+  }
+
   #tagging instances/volumes at launch to track(tag) which ec2 the instances(computers) and volumes(hard disks) are attached to
   tag_specifications {
     resource_type = "instance"

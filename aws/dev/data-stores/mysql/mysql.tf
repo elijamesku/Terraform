@@ -2,6 +2,7 @@ data "aws_vpc" "default" {
   default = true
 }
 
+#security group to allow access to db
 resource "aws_security_group" "mysql_dev" {
   name        = "dev-mysql-public"
   description = "Allow MySQL from allowed CIDR (dev)"

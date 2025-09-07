@@ -1,49 +1,36 @@
-# assumes remote-db.tf sets:
-#   local.db_secret_arn = data.terraform_remote_state.db_mysql.outputs.db_secret_arn
+# iam-db-secret.tf  (app stack)
 
-# 1) Trust policy: EC2 instances can assume this role
-data "aws_iam_policy_document" "app_trust" {
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["ec2.amazonaws.com"] # ECS: "ecs-tasks.amazonaws.com" ; Lambda: "lambda.amazonaws.com"
-    }
-    actions = ["sts:AssumeRole"]
-  }
+# Who am I / where am I?
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+data "aws_partition" "current" {}
+
+# Build an ARN pattern that works in any partition, without deprecated fields
+locals {
+  # arn:<partition>:secretsmanager:<region>:<account>:secret:dev/mysql-*
+  db_secret_arn_pattern = "arn:${data.aws_partition.current.partition}:secretsmanager:${data.aws_region.current.id}:${data.aws_caller_identity.current.account_id}:secret:dev/mysql-*"
 }
 
-# 2) The role & instance profile the ASG/instances will use
-resource "aws_iam_role" "app" {
-  name               = "dev-app-role"
-  assume_role_policy = data.aws_iam_policy_document.app_trust.json
-  tags               = { Env = "dev", ManagedBy = "terraform" }
-}
-
-resource "aws_iam_instance_profile" "app" {
-  name = "dev-app-instance-profile"
-  role = aws_iam_role.app.name
-}
-
-# 3) Policy that allows reading the DB secret
+# IAM policy: allow reading the dev/mysql secret (any suffix)
 data "aws_iam_policy_document" "db_secret_read" {
   statement {
-    sid    = "AllowReadDbSecret"
-    effect = "Allow"
+    sid     = "AllowReadDbSecret"
+    effect  = "Allow"
     actions = [
       "secretsmanager:GetSecretValue",
       "secretsmanager:DescribeSecret",
     ]
-    resources = [local.db_secret_arn]
+    resources = [local.db_secret_arn_pattern]
   }
 }
 
 resource "aws_iam_policy" "db_secret_read" {
-  name   = "dev-app-read-db-secret"
-  policy = data.aws_iam_policy_document.db_secret_read.json
+  name        = "dev-app-read-db-secret"
+  description = "Allow app to read dev/mysql secret from AWS Secrets Manager"
+  policy      = data.aws_iam_policy_document.db_secret_read.json
 }
 
-# 4) Attach the policy to the role
+# Attach to the app role defined in iam-role.tf
 resource "aws_iam_role_policy_attachment" "app_db_secret_read" {
   role       = aws_iam_role.app.name
   policy_arn = aws_iam_policy.db_secret_read.arn

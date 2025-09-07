@@ -1,24 +1,35 @@
-resource "random_password" "db" {
-  length           = 20
-  special          = true
-  override_special = "!#$%^&*()-_=+{}:,.?"
-
+# Region (use a variable to avoid deprecated data attr warnings)
+variable "aws_region" {
+  type    = string
+  default = "us-east-2"
 }
 
-resource "aws_secretsmanager_secret" "db" {
-  name = "dev/mysql"
-  tags = {
-    Env       = "dev"
-    ManagedBy = "terraform"
-    Component = "data-stores"
+# Current account & partition for a correct wildcard ARN
+data "aws_caller_identity" "current" {}
+data "aws_partition" "current" {}
+
+# Match any Secrets Manager ARN for the stable name "dev/mysql" (suffix varies)
+locals {
+  db_secret_arn_pattern = "arn:${data.aws_partition.current.partition}:secretsmanager:${var.aws_region}:${data.aws_caller_identity.current.account_id}:secret:dev/mysql-*"
+}
+
+# Policy document that allows read access to THAT secret
+data "aws_iam_policy_document" "db_secret_read" {
+  statement {
+    sid    = "AllowReadDbSecret"
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret",
+    ]
+    resources = [local.db_secret_arn_pattern]
   }
 }
 
-resource "aws_secretsmanager_secret_version" "db" {
-  secret_id = aws_secretsmanager_secret.db.id
-  secret_string = jsonencode({
-    username = var.db_username
-    password = random_password.db.result
-  })
-
+# The managed policy
+resource "aws_iam_policy" "db_secret_read" {
+  name   = "dev-app-read-db-secret"
+  policy = data.aws_iam_policy_document.db_secret_read.json
 }
+
+

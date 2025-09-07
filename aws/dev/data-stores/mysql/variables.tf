@@ -1,8 +1,8 @@
-variable "aws_region" {
+/*variable "aws_region" {
   type    = string
   default = "us-east-2"
 }
-
+*/
 variable "allowed_cidr" {
   type    = string
   default = "0.0.0.0/0"

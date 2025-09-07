@@ -65,7 +65,7 @@ resource "aws_autoscaling_group" "web" {
     preferences {
       min_healthy_percentage = 90
     }
-    triggers = ["launch_template"]
+    #triggers = ["launch_template"]
   }
 
   #create a instance and ensure that it works before destroying the one that was duplicated

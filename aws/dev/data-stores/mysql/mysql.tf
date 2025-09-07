@@ -1,6 +1,11 @@
 data "aws_vpc" "default" {
   default = true
 }
+resource "random_password" "db" {
+  length           = 20
+  special          = true
+  override_special = "!#$%^&*()-_=+{}:,.?"
+}
 
 #security group to allow access to db
 resource "aws_security_group" "mysql_dev" {
@@ -59,3 +64,5 @@ resource "aws_db_instance" "mysql" {
     Component = "data-stores"
   }
 }
+
+

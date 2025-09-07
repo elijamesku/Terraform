@@ -30,6 +30,7 @@ resource "aws_security_group" "mysql_dev" {
 
 }
 
+#creating db
 resource "aws_db_instance" "mysql" {
   identifier_prefix = "dev-mysql"
   engine            = "mysql"

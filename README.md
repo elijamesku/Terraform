@@ -5,7 +5,7 @@ Dev environment on AWS using Terraform and Git, split into independent stacks: n
 ## What’s included
 
 * **Network (Stack 1):** VPC (10.0.0.0/16), two AZs, 6 subnets (2 public, 2 private-app, 2 private-db), IGW, single NAT GW, route tables, RDS subnet group.
-* **App (Stack 2):** ALB → Target Group → ASG (EC2 with Launch Template and user-data). IAM role + instance profile. Policy to read DB creds from Secrets Manager.
+* **App (Stack 2):** ALB > Target Group > ASG (EC2 with Launch Template and user-data). IAM role + instance profile. Policy to read DB creds from Secrets Manager.
 * **Database (Stack 3):** RDS MySQL (dev). Credentials generated via `random_password` and stored in Secrets Manager.
 
 ## Repo layout

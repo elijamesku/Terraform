@@ -20,7 +20,7 @@ resource "aws_lb" "loadbalancer" {
   }
 }
 
-#Target group for the ASG/instances
+# Target group for the ASG/instances
 resource "aws_lb_target_group" "asg" {
   name     = "dev-asg-${random_pet.suffix.id}" 
   port     = var.server_port

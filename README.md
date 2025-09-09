@@ -27,7 +27,7 @@ S3 keys per stack, for example:
 * `aws/dev/app/terraform.tfstate`
 * `aws/dev/data-stores/mysql/terraform.tfstate`
 
-Enable S3 versioning and use a DynamoDB table for locks.
+Enable S3 versioning
 
 ## Deploy (dev)
 

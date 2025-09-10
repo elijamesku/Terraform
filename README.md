@@ -12,8 +12,8 @@ Dev environment on AWS using Terraform and Git, split into independent stacks: n
 
 ```
 aws/dev/
-  networks/    # VPC & subnets (outputs: vpc_id, subnet ids, db_subnet_group_name)
-  app/         # ALB, ASG, IAM (outputs: alb_dns_name)
+  networks/    # VPC & subnets
+  app/         # ALB, ASG, IAM
   data-stores/mysql/  # RDS + Secrets
 ```
 

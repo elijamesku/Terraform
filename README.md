@@ -1,6 +1,6 @@
 # AWS Dev Environment with Terraform
 
-Dev environment on AWS using Terraform and Git, split into independent stacks: network, app, and database. Each stack has its own remote S3 state and can be applied/destroyed independently
+This is a dev environment on AWS using Terraform and Git, split into independent stacks: network, app, and database. Each stack has its own remote S3 state and can be applied/destroyed independently
 
 ## What’s included
 
